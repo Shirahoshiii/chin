@@ -14,7 +14,44 @@
             overflow: hidden;
             background: #000;
             cursor: none;
-            /* optional: hide default cursor */
+        }
+        
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top, rgba(255, 150, 200, 0.1), transparent);
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        body::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(255, 100, 150, 0.3), transparent 70%);
+            transform: translate(-50%, -50%);
+            animation: pulse 4s infinite ease-in-out;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 0.2;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 0.6;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
         }
         
         .container {
@@ -29,7 +66,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 0;
+            z-index: 1;
         }
         
         .images {
@@ -39,62 +76,199 @@
             align-items: center;
             height: 100%;
             gap: 20px;
-            z-index: 1;
+            z-index: 3;
+            perspective: 1000px;
         }
         
-        .images img {
-            width: 150px;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px #e2abdb;
-            animation: float 6s ease-in-out infinite;
+        #message {
+            position: absolute;
+            top: 25px;
+            width: 100%;
+            text-align: center;
+            color: #ffb3d9;
+            font-size: 2rem;
+            font-family: "Comic Sans MS", cursive;
+            opacity: 0;
+            animation: fadeIn 3s forwards;
+            z-index: 5;
+            pointer-events: none;
         }
         
-        @keyframes float {
-            0%,
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .sparkle {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, white, pink);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 1;
+            animation: sparkleFade 1s ease-out forwards;
+            z-index: 3;
+        }
+        
+        @keyframes sparkleFade {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
             100% {
-                transform: translateY(0px);
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+        
+        .loveText {
+            position: absolute;
+            color: #ff99cc;
+            font-size: 20px;
+            opacity: 0;
+            z-index: 4;
+            pointer-events: none;
+            animation: fadeText 3s forwards;
+        }
+        
+        @keyframes fadeText {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
             }
             50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
                 transform: translateY(-20px);
             }
+        }
+        
+        #startBtn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            font-size: 16px;
+            padding: 8px 12px;
+            cursor: pointer;
+            border: none;
+            background: pink;
+            color: #000;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card {
+            width: 150px;
+            height: 200px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        
+        .card .front,
+        .card .back {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px #e2abdb;
+            transition: transform 0.6s;
+        }
+        
+        .card .front img {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+        
+        .card .back {
+            background: #ffb3d9;
+            color: #fff;
+            font-weight: bold;
+            font-size: 16px;
+            transform: rotateY(180deg);
+        }
+        
+        .card.flipped .front {
+            transform: rotateY(180deg);
+        }
+        
+        .card.flipped .back {
+            transform: rotateY(0deg);
+        }
+        
+        .petal {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            pointer-events: none;
         }
     </style>
 </head>
 
 <body>
+    <button id="startBtn">Click to Start Music ♫</button>
+    <audio id="bgmusic" loop><source src="once.mp3" type="audio/mpeg"></audio>
+
+    <div id="message">Hi Chin... ♡</div>
     <div class="container">
         <canvas id="canvas"></canvas>
         <div class="images">
-            <img src="s.jpg" alt="S">
-            <img src="o.jpg" alt="O">
-            <img src="r.jpg" alt="R">
-            <img src="rr.jpg" alt="RR">
-            <img src="y.jpg" alt="Y">
+            <div class="card" data-message="hello ♡">
+                <div class="front"><img src="s.jpg"></div>
+                <div class="back"><span>hello ♡</span></div>
+            </div>
+            <div class="card" data-message="i love you ♡">
+                <div class="front"><img src="o.jpg"></div>
+                <div class="back"><span>i love you ♡</span></div>
+            </div>
+            <div class="card" data-message="i miss you ♡">
+                <div class="front"><img src="r.jpg"></div>
+                <div class="back"><span>i miss you ♡</span></div>
+            </div>
+            <div class="card" data-message="i'm sorry ♡">
+                <div class="front"><img src="rr.jpg"></div>
+                <div class="back"><span>i'm sorry ♡</span></div>
+            </div>
+            <div class="card" data-message="Aeris ♡">
+                <div class="front"><img src="y.jpg"></div>
+                <div class="back"><span>Aeris ♡</span></div>
+            </div>
         </div>
     </div>
 
     <script>
-        let canvas = document.getElementById('canvas');
+        const startBtn = document.getElementById("startBtn");
+        const audio = document.getElementById("bgmusic");
+        let audioCtx, source, analyser, dataArray, bufferLength;
+
+        const canvas = document.getElementById('canvas');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        let ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d');
 
-        let origin = {
+        const origin = {
             x: canvas.width / 2,
             y: canvas.height / 2
         };
-        let mouse = {
+        const mouse = {
             x: origin.x,
-
             y: origin.y
         };
+        const dots = [];
+        const dotsCount = 120;
 
-        let dots = [];
-        let dotsCount = 120; // denser heart
-
-        // Initialize heart dots
+        // Heart shape dots
         for (let i = 0; i < dotsCount; i++) {
             let t = i / (dotsCount - 1) * Math.PI * 2;
             let scale = 15 + Math.random() * 5;
@@ -106,59 +280,175 @@
                 baseX: x,
                 baseY: y,
                 size: 2 + Math.random() * 2,
-                color: `rgba(255,50,100,${0.5+Math.random()*0.5})`
+                color: `rgba(255,50,100,${0.3+Math.random()*0.3})`
             });
         }
 
-        // Track mouse
+        // Mouse sparkles
+        function createSparkle(x, y) {
+            const s = document.createElement("div");
+            s.classList.add("sparkle");
+            s.style.left = x + "px";
+            s.style.top = y + "px";
+            document.body.appendChild(s);
+            setTimeout(() => s.remove(), 1000);
+        }
         window.addEventListener('mousemove', e => {
             mouse.x = e.clientX;
             mouse.y = e.clientY;
+            createSparkle(mouse.x, mouse.y);
         });
 
-        // Animation
+        // Floating messages
+        const messages = ["I miss you ♡", "I love you ♡", "I'm sorry", " ♡"];
+
+        function popMessage() {
+            const m = document.createElement("div");
+            m.classList.add("loveText");
+            m.style.left = Math.random() * (window.innerWidth - 100) + "px";
+            m.style.top = Math.random() * (window.innerHeight - 50) + "px";
+            m.innerText = messages[Math.floor(Math.random() * messages.length)];
+            document.body.appendChild(m);
+            setTimeout(() => m.remove(), 3000);
+        }
+        setInterval(popMessage, 2500);
+
+        // Rose petals
+        const petals = [],
+            petalCount = 15,
+            petalColors = ["#ff77b7", "#ff99cc", "#ffb3d9"];
+
+        function createPetal() {
+            const p = document.createElement("div");
+            p.classList.add("petal");
+            p.style.background = petalColors[Math.floor(Math.random() * petalColors.length)];
+            p.style.left = Math.random() * window.innerWidth + "px";
+            p.style.top = "-20px";
+            p.style.transform = `rotate(${Math.random()*360}deg)`;
+            document.body.appendChild(p);
+            const speed = 1 + Math.random() * 2;
+            const rotationSpeed = (Math.random() - 0.5) * 2;
+            const sway = Math.random() * 2;
+            petals.push({
+                el: p,
+                speed,
+                rotationSpeed,
+                sway
+            });
+
+        }
+
+        function animatePetals() {
+            for (let i = petals.length - 1; i >= 0; i--) {
+                const p = petals[i];
+                let top = parseFloat(p.el.style.top);
+                let left = parseFloat(p.el.style.left);
+                let angle = parseFloat(p.el.style.transform.replace(/rotate\((.*)deg\)/, "$1"));
+                top += p.speed;
+                left += Math.sin(Date.now() / 500 + i) * p.sway;
+                angle += p.rotationSpeed;
+                p.el.style.top = top + "px";
+                p.el.style.left = left + "px";
+                p.el.style.transform = `rotate(${angle}deg)`;
+                if (top > window.innerHeight) {
+                    p.el.remove();
+                    petals.splice(i, 1);
+                }
+            }
+            requestAnimationFrame(animatePetals);
+        }
+        setInterval(() => {
+            if (petals.length < petalCount) createPetal();
+        }, 500);
+        animatePetals();
+
+        // Start music and audio analyzer
+        startBtn.addEventListener("click", async() => {
+            await audio.play();
+            audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+            source = audioCtx.createMediaElementSource(audio);
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 128;
+            bufferLength = analyser.frequencyBinCount;
+            dataArray = new Uint8Array(bufferLength);
+            source.connect(analyser);
+            analyser.connect(audioCtx.destination);
+            startBtn.style.display = "none";
+        });
+
+        // Heart dots animation
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let avg = 0;
+            if (analyser && dataArray) {
+                analyser.getByteFrequencyData(dataArray);
+                avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length / 255;
+            }
 
             dots.forEach(dot => {
-                // calculate distance to mouse
                 let dx = dot.x - mouse.x;
                 let dy = dot.y - mouse.y;
                 let dist = Math.sqrt(dx * dx + dy * dy);
-
-                // if close to mouse, repel the dot
-                let force = Math.min(50, 200 / dist); // stronger when closer
+                let force = Math.min(20, 100 / dist);
                 if (dist < 100) {
                     dot.x += (dx / dist) * force;
                     dot.y += (dy / dist) * force;
                 } else {
-                    // slowly return to base position
                     dot.x += (dot.baseX - dot.x) * 0.05;
                     dot.y += (dot.baseY - dot.y) * 0.05;
                 }
-
-                // add slight floating motion
-                dot.x += Math.sin(Date.now() / 500 + dot.size) * 0.5;
-                dot.y += Math.cos(Date.now() / 500 + dot.size) * 0.5;
-
-                // draw
+                dot.x += Math.sin(Date.now() / 400 + dot.size) * 1.5;
+                dot.y += Math.cos(Date.now() / 400 + dot.size) * 1.5;
+                const size = dot.size * (1 + avg * 0.5);
                 ctx.fillStyle = dot.color;
                 ctx.beginPath();
-                ctx.arc(dot.x, dot.y, dot.size, 0, Math.PI * 2);
+                ctx.arc(dot.x, dot.y, size, 0, Math.PI * 2);
                 ctx.fill();
             });
+
+            document.querySelectorAll('.images img').forEach((img, i) => {
+                img.style.transform = `translateY(${Math.sin(Date.now()/2000+i)*5}px) scale(${1+avg*0.05})`;
+            });
+
+            // Soft audio bars
+            if (analyser && dataArray) {
+                const barWidth = (canvas.width / bufferLength) * 2;
+                let x = 0;
+                for (let i = 0; i < bufferLength; i++) {
+                    const barHeight = dataArray[i] * 0.15;
+                    ctx.fillStyle = `rgba(226, 171, 219, 1.5)`;
+                    ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+                    x += barWidth + 1;
+                }
+            }
 
             requestAnimationFrame(animate);
         }
         animate();
+
+        // Card click messages
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('click', () => {
+                card.classList.toggle('flipped');
+                const msg = card.getAttribute('data-message');
+                const m = document.createElement("div");
+                m.classList.add("loveText");
+
+                // Position above the card
+                const rect = card.getBoundingClientRect();
+                m.style.left = rect.left + rect.width / 2 - 50 + "px";
+                m.style.top = rect.top - 30 + "px";
+                m.innerText = msg;
+                document.body.appendChild(m);
+                setTimeout(() => m.remove(), 3000);
+            });
+        });
 
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             origin.x = canvas.width / 2;
             origin.y = canvas.height / 2;
-
-            // Recalculate base positions of dots
             for (let i = 0; i < dotsCount; i++) {
                 let t = i / (dotsCount - 1) * Math.PI * 2;
                 let scale = 15 + Math.random() * 5;
